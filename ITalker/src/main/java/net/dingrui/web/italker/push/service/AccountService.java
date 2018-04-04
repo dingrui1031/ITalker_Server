@@ -1,6 +1,6 @@
 package net.dingrui.web.italker.push.service;
 
-import net.dingrui.web.italker.push.bean.User;
+import net.dingrui.web.italker.push.bean.db.User;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -25,7 +25,7 @@ public class AccountService {
     public User post(){
         User user = new User();
         user.setName("张三");
-        user.setSex("男");
+        user.setSex(0);
         return user;
     }
 }

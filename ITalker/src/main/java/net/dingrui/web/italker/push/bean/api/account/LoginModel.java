@@ -6,13 +6,12 @@ import com.google.gson.annotations.Expose;
 /**
  * @author dingrui
  */
-public class RegisterModel {
+public class LoginModel {
+
     @Expose
     private String account;
     @Expose
     private String password;
-    @Expose
-    private String name;
     @Expose
     private String pushId;
 
@@ -32,14 +31,6 @@ public class RegisterModel {
         this.password = password;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getPushId() {
         return pushId;
     }
@@ -49,15 +40,13 @@ public class RegisterModel {
     }
 
     /**
-     * 校验用户名密码姓名是否为空
-     * @param registerModel
+     * 校验账户密码是否为空
+     * @param loginModel
      * @return
      */
-    public static boolean check(RegisterModel registerModel) {
-        return registerModel != null
-                && !Strings.isNullOrEmpty(registerModel.account)
-                && !Strings.isNullOrEmpty(registerModel.password)
-                && !Strings.isNullOrEmpty(registerModel.name);
-
+    public static boolean check(LoginModel loginModel) {
+        return loginModel != null
+                && !Strings.isNullOrEmpty(loginModel.account)
+                && !Strings.isNullOrEmpty(loginModel.password);
     }
 }

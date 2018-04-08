@@ -108,7 +108,7 @@ public class Hib {
     public static <T> T query(Query<T> query) {
         // 重开一个Session
         Session session = sessionFactory.openSession();
-        // 开启事物
+        // 开启事务
         final Transaction transaction = session.beginTransaction();
 
         T t = null;

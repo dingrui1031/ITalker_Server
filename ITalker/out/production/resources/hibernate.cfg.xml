@@ -55,21 +55,23 @@
         validate: 启动时验证现有schema与你配置的hibernate是否一致，如果不一致就抛出异常，并不做更新
         -->
 
+        <mapping package="net.dingrui.web.italker.push.bean.db"
+                 class="net.dingrui.web.italker.push.bean.db.User"/>
+        <mapping package="net.dingrui.web.italker.push.bean.db"
+                 class="net.dingrui.web.italker.push.bean.db.UserFollow"/>
 
         <mapping package="net.dingrui.web.italker.push.bean.db"
-        class="net.dingrui.web.italker.push.bean.db.Group"/>
+                 class="net.dingrui.web.italker.push.bean.db.Group"/>
         <mapping package="net.dingrui.web.italker.push.bean.db"
-        class="net.dingrui.web.italker.push.bean.db.GroupMember"/>
+                 class="net.dingrui.web.italker.push.bean.db.GroupMember"/>
+
         <mapping package="net.dingrui.web.italker.push.bean.db"
-        class="net.dingrui.web.italker.push.bean.db.User"/>
+                 class="net.dingrui.web.italker.push.bean.db.Message"/>
+
         <mapping package="net.dingrui.web.italker.push.bean.db"
-        class="net.dingrui.web.italker.push.bean.db.UserFollow"/>
+                 class="net.dingrui.web.italker.push.bean.db.PushHistory"/>
         <mapping package="net.dingrui.web.italker.push.bean.db"
-        class="net.dingrui.web.italker.push.bean.db.Message"/>
-        <mapping package="net.dingrui.web.italker.push.bean.db"
-        class="net.dingrui.web.italker.push.bean.db.PushHistory"/>
-        <mapping package="net.dingrui.web.italker.push.bean.db"
-        class="net.dingrui.web.italker.push.bean.db.Apply"/>
+                 class="net.dingrui.web.italker.push.bean.db.Apply"/>
 
     </session-factory>
 </hibernate-configuration>

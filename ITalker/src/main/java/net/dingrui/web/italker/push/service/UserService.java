@@ -17,31 +17,29 @@ import javax.ws.rs.core.MediaType;
  */
 // 127.0.0.1/api/user/...
 @Path("/user")
-public class UserService {
+public class UserService extends BaseService {
 
     @PUT
     //@Path("") //127.0.0.1/api/user 不需要写，就是当前目录
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseModel<UserCard> update(@HeaderParam("token") String token,
-                                          UpdateInfoModel updateInfoModel) {
+    public ResponseModel<UserCard> update(UpdateInfoModel updateInfoModel) {
 
-        if (Strings.isNullOrEmpty("token") || !UpdateInfoModel.check(updateInfoModel)) {
+        if (!UpdateInfoModel.check(updateInfoModel)) {
             return ResponseModel.buildParameterError();
         }
 
         //拿到自己个人信息
-        User user = UserFactory.findByToken("token");
+//        User user = UserFactory.findByToken("token");
+        User self = getSelf();
 
-        if (user!=null) {
-            user = updateInfoModel.updateToUser(user);
-            user = UserFactory.update(user);
-            UserCard userCard = new UserCard(user, true);
-            return ResponseModel.buildOk(userCard);
-        }else {
-            //token失效，所以无法进行绑定
-            return ResponseModel.buildAccountError();
-        }
+        self = updateInfoModel.updateToUser(self);
+        // 更新用户信息
+        self = UserFactory.update(self);
+        // 构建自己的用户信息
+        UserCard userCard = new UserCard(self, true);
+        //返回
+        return ResponseModel.buildOk(userCard);
 
     }
 }

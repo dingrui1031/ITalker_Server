@@ -1,5 +1,6 @@
 package net.dingrui.web.italker.push;
 
+import net.dingrui.web.italker.push.provider.AuthRequestFilter;
 import net.dingrui.web.italker.push.provider.GsonProvider;
 import net.dingrui.web.italker.push.service.AccountService;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -15,7 +16,7 @@ public class Application extends ResourceConfig {
         register(AccountService.class.getPackage().getName());
 
         // 注册我们的全局请求拦截器
-//        register(AuthRequestFilter.class);
+        register(AuthRequestFilter.class);
 
         // 注册Json解析器
         // register(JacksonJsonProvider.class);

@@ -55,6 +55,7 @@ public class UserFactory {
 
     /**
      * 更新用户信息到数据库
+     *
      * @param user
      * @return
      */
@@ -178,7 +179,10 @@ public class UserFactory {
         // 账户就是手机号
         user.setPhone(account);
         // 数据库存储
-        return Hib.query(session -> (User) session.save(user));
+        return Hib.query(session -> {
+            session.save(user);
+            return user;
+        });
     }
 
     /**

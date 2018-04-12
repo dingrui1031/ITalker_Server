@@ -16,7 +16,7 @@ import javax.ws.rs.core.MediaType;
  */
 // 127.0.0.1/api/account/...
 @Path("/account")
-public class AccountService {
+public class AccountService extends BaseService{
 
     @POST
     //指定请求与返回的响应体
@@ -103,6 +103,7 @@ public class AccountService {
     @Path("/bind/{pushId}")
     //从请求头中获取token字段
     //pushId从url地址中获取
+    //其实在拦截器中已经校验了token，所以以后都不需要在请求头中传token，这里留着以后看
     public ResponseModel<AccountRspModel> bind(@HeaderParam("token") String token,
                                                @PathParam("pushId") String pushId) {
 
@@ -113,8 +114,9 @@ public class AccountService {
         }
 
         //拿到用户自己的信息
-        User user = UserFactory.findByToken(token);
-        return bind(user, pushId);
+//        User user = UserFactory.findByToken(token);
+        User self = getSelf();
+        return bind(self, pushId);
     }
 
     /**

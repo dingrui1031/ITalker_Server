@@ -2,11 +2,16 @@ package net.dingrui.web.italker.push.factory;
 
 import com.google.common.base.Strings;
 import net.dingrui.web.italker.push.bean.db.User;
+import net.dingrui.web.italker.push.bean.db.UserFollow;
 import net.dingrui.web.italker.push.utils.Hib;
 import net.dingrui.web.italker.push.utils.TextUtil;
 
+import java.lang.invoke.SerializedLambda;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author dingrui
@@ -54,6 +59,17 @@ public class UserFactory {
     }
 
     /**
+     * 通过id找到user
+     *
+     * @param id
+     * @return
+     */
+    public static User findById(String id) {
+        //通过id查询更方便
+        return Hib.query(session -> session.get(User.class, id));
+    }
+
+    /**
      * 更新用户信息到数据库
      *
      * @param user
@@ -74,6 +90,7 @@ public class UserFactory {
      * @param pushId 自己设备的pushId
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static User bindPushId(User user, String pushId) {
 
         if (Strings.isNullOrEmpty("pushId"))
@@ -215,5 +232,111 @@ public class UserFactory {
         password = TextUtil.getMD5(password);
         //在进行一次base64对称加密，可以采取加盐的方式
         return TextUtil.encodeBase64(password);
+    }
+
+    /**
+     * 获取联系人的列表
+     *
+     * @param self user
+     * @return user集合
+     */
+    public static List<User> contacts(User self) {
+        return Hib.query(session -> {
+            //重新加载一次用户信息到self中，和当前session绑定
+            session.load(self, self.getId());
+
+            //获取关注的人
+            Set<UserFollow> follows = self.getFollowing();
+
+            //常规操作
+//            List<User> users = new ArrayList<>();
+//            for (UserFollow follow : follows) {
+//                users.add(follow.getTarget());
+//            }
+
+            //java8的简写操作
+            return follows.stream()
+                    .map(UserFollow::getTarget)
+                    .collect(Collectors.toList());
+        });
+    }
+
+    /**
+     * 关注人的操作
+     *
+     * @param origin 发起者
+     * @param target 被关注人
+     * @param alias  备注名
+     * @return 被关注人的信息
+     */
+    public static User follow(final User origin, final User target, final String alias) {
+        UserFollow follow = getUserFollow(origin, target);
+        if (follow != null) {
+            //已关注，直接返回
+            return follow.getTarget();
+        }
+
+        //
+        return Hib.query(session -> {
+            //想要操作懒加载的数据，需要重新load一次
+            session.load(origin, origin.getId());
+            session.load(target, target.getId());
+
+            //我关注人的时候，同时也关注我
+            //所以需要添加两条UserFollow数据
+            UserFollow originFollow = new UserFollow();
+            originFollow.setOrigin(origin);
+            originFollow.setTarget(target);
+            originFollow.setAlias(alias);
+
+            //发起者是他，我是被关注的人的记录
+            UserFollow targetFollow = new UserFollow();
+            targetFollow.setOrigin(target);
+            targetFollow.setTarget(origin);
+
+            //保存数据库
+            session.save(originFollow);
+            session.save(targetFollow);
+
+            return target;
+        });
+    }
+
+    /**
+     * 查询两个人是否已经关注过
+     *
+     * @param origin 发起者
+     * @param target 被关注人
+     * @return 返回中间类UserFollow
+     */
+    public static UserFollow getUserFollow(final User origin, final User target) {
+        return Hib.query(session -> (UserFollow) session.createQuery("from UserFollow where originId=:originId and targetId=:targetId")
+                .setParameter("originId", origin.getId())
+                .setParameter("targetId", target.getId())
+                .setMaxResults(1)
+                //唯一查询返回
+                .uniqueResult());
+    }
+
+    /**
+     * 搜索联系人的实现
+     *
+     * @param name 允许为空
+     * @return 用户集合，如果name为空，则返回最近的用户
+     */
+    @SuppressWarnings("unchecked")
+    public static List<User> search(String name) {
+        if (Strings.isNullOrEmpty(name))
+            name = ""; //保证不能为null的情况，减少后面的判断和额外错误
+
+        final String searchName = "%" + name + "%";//模糊匹配
+
+        return Hib.query(session -> {
+            //查询的条件：name忽略大小写，并且使用模糊查询，头像和描述必须完善
+            return (List<User>) session.createQuery("from User where lower(name) like :name and portrait is not null and description is not null ")
+                    .setParameter("name", searchName)
+                    .setMaxResults(20)//只多20条
+                    .list();
+        });
     }
 }

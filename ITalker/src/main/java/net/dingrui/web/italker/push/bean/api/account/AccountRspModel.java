@@ -13,7 +13,7 @@ public class AccountRspModel {
 
     // 用户基本信息
     @Expose
-    private UserCard userCard;
+    private UserCard user;
     // 当前登录的账号
     @Expose
     private String account;
@@ -31,18 +31,18 @@ public class AccountRspModel {
     }
 
     public AccountRspModel(User user, boolean isBind) {
-        this.userCard = new UserCard(user);
+        this.user = new UserCard(user);
         this.account = user.getPhone();
         this.token = user.getToken();
         this.isBind = isBind;
     }
 
     public UserCard getUserCard() {
-        return userCard;
+        return user;
     }
 
     public void setUserCard(UserCard userCard) {
-        this.userCard = userCard;
+        this.user = userCard;
     }
 
     public String getAccount() {
